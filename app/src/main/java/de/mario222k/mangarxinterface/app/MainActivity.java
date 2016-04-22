@@ -1,4 +1,4 @@
-package de.mario222k.mangarxinterface;
+package de.mario222k.mangarxinterface.app;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
