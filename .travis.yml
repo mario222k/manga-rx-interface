@@ -1,0 +1,28 @@
+language: android
+
+sudo: false
+
+branches:
+  only: master
+
+script: ./gradlew :interface:install
+
+android:
+  components:
+    - build-tools-23.0.1
+    - android-23
+
+    - platform-tools
+    - tools
+    - extra-android-support
+    - extra-android-m2repository
+    - extra-google-m2repository
+
+env:
+  global:
+  # try to fix "PermGen space"
+  - GRADLE_OPTS="-Xmx256m -XX:MaxPermSize=256m"
+
+after_success:
+  # run bintray upload straight after deploy
+  - ./gradlew :interface:bintrayUpload
