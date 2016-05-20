@@ -12,7 +12,7 @@ def git_url = "https://github.com/mario222k/manga-rx-interface.git"
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         minSdkVersion 21
