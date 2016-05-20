@@ -20,8 +20,7 @@ class Manga : Parcelable {
         url = `in`.readString()
         cover = `in`.readString()
         chapters = ArrayList()
-        @Suppress("UNCHECKED_CAST")
-        setChaptersFromArray(`in`.readParcelableArray(Chapter::class.java.getClassLoader()) as Array<Chapter>?)
+        `in`.readTypedList(chapters, Chapter.CREATOR)
     }
 
     override fun describeContents() = 0
@@ -30,17 +29,7 @@ class Manga : Parcelable {
         dest.writeString(name)
         dest.writeString(url)
         dest.writeString(cover)
-        val array = Array(chapters.size, { i -> Chapter("", "") })
-        chapters.toArray(array)
-        dest.writeParcelableArray(array, flags)
-    }
-
-    private fun setChaptersFromArray(array: Array<Chapter>?) {
-        val count = array?.size ?: -1
-
-        for (i in 0..count - 1) {
-            chapters.add(i, array!![i])
-        }
+        dest.writeTypedList(chapters)
     }
 
     companion object {

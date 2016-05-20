@@ -2,14 +2,15 @@ package de.mario222k.mangarxinterface.model
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.v4.util.SparseArrayCompat
+import android.util.SparseArray
+import java.util.*
 
 class Chapter : Parcelable {
     var name: String? = null
         private set
     var url: String? = null
         private set
-    var pages: SparseArrayCompat<Page>? = null
+    var pages: SparseArray<Page>? = null
         private set
 
     constructor(name: String, url: String) {
@@ -25,14 +26,14 @@ class Chapter : Parcelable {
      * @return chapter page count or `-1`
      */
     var pageCount: Int
-        get() = if (pages == null) -1 else pages?.size()
+        get() = pages?.size() ?: -1
         set(pageCount) {
             if (pages != null) {
                 pages?.clear()
             }
 
             if (pageCount >= 0) {
-                pages = SparseArrayCompat<Page>(pageCount)
+                pages = SparseArray<Page>(pageCount)
 
             } else {
                 pages = null
@@ -42,8 +43,9 @@ class Chapter : Parcelable {
     private constructor(`in`: Parcel) {
         name = `in`.readString()
         url = `in`.readString()
-        @Suppress("UNCHECKED_CAST")
-        setPagesFromArray(`in`.readParcelableArray(Page::class.java.getClassLoader()) as Array<Page>?)
+        val list = ArrayList<Page>()
+        `in`.readTypedList(list, Page.CREATOR)
+        setPagesFromList(list)
     }
 
     override fun describeContents() = 0
@@ -64,7 +66,7 @@ class Chapter : Parcelable {
             return Array(length, { i -> pages?.get(i) ?: Page(i, "") })
         }
 
-    private fun setPagesFromArray(array: Array<Page>?) {
+    private fun setPagesFromList(array: ArrayList<Page>?) {
         if (array == null) {
             pageCount = -1
             return
