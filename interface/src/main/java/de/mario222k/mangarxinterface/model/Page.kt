@@ -26,6 +26,16 @@ class Page : Parcelable {
         dest.writeString(url)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if(other !is Page) {
+            return false
+        }
+
+        return page == other.page && url.equals(other.url)
+    }
+
+    override fun hashCode() = page.hashCode() * 31 + url.hashCode()
+
     companion object {
         @JvmField // requested by android to keep static field
         val CREATOR: Parcelable.Creator<Page> = object : Parcelable.Creator<Page> {

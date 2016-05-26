@@ -3,7 +3,6 @@ package de.mario222k.mangarxinterface.model
 import android.os.Parcel
 import android.os.Parcelable
 import android.util.SparseArray
-import java.util.*
 
 class Chapter : Parcelable {
     var name: String? = null
@@ -19,33 +18,10 @@ class Chapter : Parcelable {
         pages = null
     }
 
-    /**
-     * Hold information about loaded pages. Should be equal with
-     * Pages size or `-1` for not loaded.
-
-     * @return chapter page count or `-1`
-     */
-    var pageCount: Int
-        get() = pages?.size() ?: -1
-        set(pageCount) {
-            if (pages != null) {
-                pages?.clear()
-            }
-
-            if (pageCount >= 0) {
-                pages = SparseArray<Page>(pageCount)
-
-            } else {
-                pages = null
-            }
-        }
-
     private constructor(`in`: Parcel) {
         name = `in`.readString()
         url = `in`.readString()
-        val list = ArrayList<Page>()
-        `in`.readTypedList(list, Page.CREATOR)
-        setPagesFromList(list)
+        setPagesFromArray(`in`.createTypedArray(Page.CREATOR))
     }
 
     override fun describeContents() = 0
@@ -53,29 +29,100 @@ class Chapter : Parcelable {
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeString(name)
         dest.writeString(url)
-        dest.writeParcelableArray(pagesAsArray, flags)
+        dest.writeTypedArray(getArrayFromPages(), flags)
     }
 
-    private val pagesAsArray: Array<Page>?
-        get() {
-            if (pages == null) {
-                return null
-            }
-
-            val length = pages?.size() ?: 0
-            return Array(length, { i -> pages?.get(i) ?: Page(i, "") })
+    override fun equals(other: Any?): Boolean {
+        if(other !is Chapter) {
+            return false
         }
 
-    private fun setPagesFromList(array: ArrayList<Page>?) {
+        if(getPageCount() != other.getPageCount()) {
+            return false
+        }
+
+        if(pages == null && other.pages != null) {
+            return false
+        }
+
+        if(pages != null && other.pages == null) {
+            return false
+        }
+
+        val arrayOfPages = getArrayFromPages()
+        if(arrayOfPages != null) {
+            for (page in arrayOfPages) {
+                if (!other.pageContains(page)) {
+                    return false
+                }
+            }
+        }
+
+        return name.equals(other.name) &&
+                url.equals(other.url)
+    }
+
+    override fun hashCode(): Int {
+        var hash = name?.hashCode() ?: 0
+        hash = hash * 31 + (url?.hashCode() ?: 0)
+
+        val arrayOfPages = getArrayFromPages() ?: return hash
+        for(page in arrayOfPages) {
+            hash = hash * 31 + page.hashCode()
+        }
+
+        return hash
+    }
+
+    fun addPage(index: Int, page: Page) {
+        if(pages == null) {
+            pages = SparseArray(index)
+        }
+
+        pages?.put(index, page)
+    }
+
+    /**
+     * Hold information about loaded pages. Should be equal with
+     * Pages size or `-1` for not loaded.
+
+     * @return chapter page count or `-1`
+     */
+    fun getPageCount() = pages?.size() ?: -1
+
+    private fun pageContains(page: Page?): Boolean {
+        if (page == null) {
+            return false
+        }
+        for (i in 0..getPageCount() - 1) {
+            if (page.equals(pages?.get(i))) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun getArrayFromPages(): Array<Page>? {
+        if (pages == null) {
+            return null
+        }
+
+        val length = pages?.size() ?: 0
+        return Array(length, { i -> pages?.get(i) ?: Page(i, "") })
+    }
+
+    private fun setPagesFromArray(array: Array<Page>?) {
         if (array == null) {
-            pageCount = -1
+            pages = null
             return
         }
 
-        pageCount = array.size
-
-        for (i in 0..pageCount - 1) {
-            pages?.put(i, array[i])
+        val count = array.size
+        if(pages == null) {
+            pages = SparseArray(count)
+        }
+        for (i in 0..count - 1) {
+            addPage(i, array[i])
         }
     }
 
