@@ -3,21 +3,9 @@ package de.mario222k.mangarxinterface.model
 import android.os.Parcel
 import android.os.Parcelable
 
-class Page : Parcelable {
-    var page: Int = 0
-        private set
-    var url: String = ""
-        private set
-
-    constructor(page: Int, url: String) {
-        this.page = page
-        this.url = url
-    }
-
-    constructor(`in`: Parcel) {
-        page = `in`.readInt()
-        url = `in`.readString()
-    }
+data class Page(
+        val page: Int = 0,
+        val url: String? = "") : Parcelable {
 
     override fun describeContents() = 0
 
@@ -26,21 +14,11 @@ class Page : Parcelable {
         dest.writeString(url)
     }
 
-    override fun equals(other: Any?): Boolean {
-        if(other !is Page) {
-            return false
-        }
-
-        return page == other.page && url.equals(other.url)
-    }
-
-    override fun hashCode() = page.hashCode() * 31 + url.hashCode()
-
     companion object {
         @JvmField // requested by android to keep static field
         val CREATOR: Parcelable.Creator<Page> = object : Parcelable.Creator<Page> {
-            override fun createFromParcel(`in`: Parcel) = Page(`in`)
-            override fun newArray(size: Int) = Array(size, {i -> Page(-1, "")})
+            override fun createFromParcel(`in`: Parcel) = Page(`in`.readInt(), `in`.readString())
+            override fun newArray(size: Int) = Array(size, { _ -> Page(-1, "") })
         }
     }
 }

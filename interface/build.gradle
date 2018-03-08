@@ -4,20 +4,20 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'kotlin-android'
 
-def app_version = "0.2.1"
-def vcs_tag = "0.2.1"
+def app_version = "0.4"
+def vcs_tag = "0.4"
 def description = "Model and AIDL definition for MangaRx Plugins"
 def web_url = "https://github.com/mario222k/manga-rx-interface"
 def git_url = "https://github.com/mario222k/manga-rx-interface.git"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 23
-        versionCode 3
+        targetSdkVersion 27
+        versionCode 4
         versionName app_version
     }
 
