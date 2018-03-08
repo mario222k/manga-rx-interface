@@ -5,12 +5,15 @@ sudo: false
 branches:
   only: master
 
+before_install:
+  - yes | sdkmanager "platforms;android-27"
+
 script: ./gradlew :interface:install
 
 android:
   components:
-    - build-tools-23.0.1
-    - android-23
+    - build-tools-27.0.3
+    - android-27
 
     - platform-tools
     - tools
